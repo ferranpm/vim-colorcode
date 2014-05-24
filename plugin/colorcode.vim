@@ -37,7 +37,7 @@ endfunction
 
 function! g:GetMatch(name, type, file)
     let l:extension = g:GetExtension(a:file)
-    let l:match = '\<'.a:name.'\>'
+    let l:match = '\<'.escape(a:name, "~").'\>'
 
     if a:type == "m"
         if l:extension == "c" || l:extension == "h"
