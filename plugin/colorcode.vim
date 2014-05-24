@@ -35,21 +35,22 @@ function! g:GetColor(num)
     return g:Colorcode_colors[a:num%l:len]
 endfunction
 
-" if a:0 > 0:
-"   a:1 => struct:name_struct | union:name_union ...
-function! g:GetMatch(word, type, file, ...)
+function! g:GetMatch(name, type, file)
     let l:extension = g:GetExtension(a:file)
-    let l:match = '\<'.a:word.'\>'
+    let l:match = '\<'.a:name.'\>'
 
-    if l:extension == "c" || l:extension == "h"
-        if a:type == "m" && a:0 >= 1
+    if a:type == "m"
+        if l:extension == "c" || l:extension == "h"
             let l:match = '\(\.\|->\)'.l:match
+        else
+            let l:match = '\.'.l:match
+        endif
+    elseif a:type == "f"
+        if l:extension == "c" || l:extension == "h"
+            let l:match = l:match.' *(.*)'
         endif
     endif
 
-    if a:type == "f"
-        let l:match = l:match.' *(.*)'
-    endif
     return l:match
 endfunction
 
@@ -81,13 +82,7 @@ function! g:Colorcode()
                     let l:tagfile = l:split[1]
                     let l:tagaddress = l:split[2]
                     let l:tagfield = l:split[3]
-                    let l:match = ""
-                    if l:tagfield == 'm' && len(l:split) > 4
-                        let l:tagfieldname = split(l:split[4], ":")[1]
-                        let l:match = g:GetMatch(l:tagname, l:tagfield, l:tagfile, l:tagfieldname)
-                    else
-                        let l:match = g:GetMatch(l:tagname, l:tagfield, l:tagfile)
-                    endif
+                    let l:match = g:GetMatch(l:tagname, l:tagfield, l:tagfile)
 
                     let l:priority = g:GetPriority(l:tagfield)
                     let l:color = g:GetColor(l:hi_nr)
