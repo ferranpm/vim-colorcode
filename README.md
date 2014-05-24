@@ -3,7 +3,7 @@ Inspired by [this post](https://medium.com/programming-ideas-tutorial-and-experi
 
 ## Installation
 
-* Using [Pathogen][https://github.com/tpope/vim-pathogen], run the following commands:
+* Using [Pathogen](https://github.com/tpope/vim-pathogen), run the following commands:
 
         % cd ~/.vim/bundle
         % git clone https://github.com/ferranpm/vim-colorcode
