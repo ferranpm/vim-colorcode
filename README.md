@@ -11,3 +11,8 @@ Inspired by [this post](https://medium.com/programming-ideas-tutorial-and-experi
 ## Usage
 
 This plugin will only work if the tags file is in your working directory.
+
+## Screenshots
+
+Screenshot of a simple program with :syntax off
+![Screenshot\_1](screenshot_1.jpg)
