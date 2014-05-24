@@ -43,4 +43,4 @@ function g:Colorcode_file()
     endfor
 endfunction
 
-call g:Colorcode_file()
+autocmd BufRead * call g:Colorcode_file()
