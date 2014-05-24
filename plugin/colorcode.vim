@@ -48,30 +48,30 @@ endfunction
 
 function g:ClearMatches()
     for m in getmatches()
-        call matchdelete(m['id'])
+        if match(m['id'], 'Colorcode_') != -1
+            call matchdelete(m['id'])
+        endif
     endfor
 endfunction
 
 function g:Colorcode_file()
     call g:ClearMatches()
-    let l:hi_nr = 5
+    let l:hi_nr = 0
     for file in tagfiles()
         if filereadable(file)
             for line in readfile(file)
                 if line[0] != '!' " if the line is not a comment, parse it
                     let words = split(line, "\t")
-                    if words[1] == expand("%")
-                        let l:priority = g:GetPriority(words[3])
-                        let l:match = g:GetMatch(words[0], words[3])
-                        let l:color = g:GetColor(l:hi_nr)
-                        execute 'highlight '.l:hi_nr.' cterm=None ctermfg='.l:color.' ctermbg=None'
-                        call matchadd(l:hi_nr, l:match, l:priority)
-                        let l:hi_nr = l:hi_nr + 1
-                    endif
+                    let l:priority = g:GetPriority(words[3])
+                    let l:match = g:GetMatch(words[0], words[3])
+                    let l:color = g:GetColor(l:hi_nr)
+                    execute 'highlight '.'Colorcode_'.l:hi_nr.' cterm=None ctermfg='.l:color.' ctermbg=None'
+                    call matchadd('Colorcode_'.l:hi_nr, l:match, l:priority)
+                    let l:hi_nr = l:hi_nr + 1
                 endif
             endfor
         endif
     endfor
 endfunction
 
-autocmd BufRead * call g:Colorcode_file()
+call g:Colorcode_file()
