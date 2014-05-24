@@ -25,20 +25,35 @@ let g:Colorcode_colors = [
             \ '88', '175', '206', '78', '74', '129', '141', '116', '58', '125',
             \ '142', '121', '32']
 
-function g:GetColor(num)
+function! g:GetExtension(file)
+    let l:ar = split(a:file, '\.')
+    return l:ar[len(l:ar)-1]
+endfunction
+
+function! g:GetColor(num)
     let l:len = len(g:Colorcode_colors)
     return g:Colorcode_colors[a:num%l:len]
 endfunction
 
-function g:GetMatch(word, type)
+" if a:0 > 0:
+"   a:1 => struct:name_struct | union:name_union ...
+function! g:GetMatch(word, type, file, ...)
+    let l:extension = g:GetExtension(a:file)
     let l:match = '\<'.a:word.'\>'
+
+    if l:extension == "c" || l:extension == "h"
+        if a:type == "m" && a:0 >= 1
+            let l:match = '\(\.\|->\)'.l:match
+        endif
+    endif
+
     if a:type == "f"
         let l:match = l:match.' *(.*)'
     endif
     return l:match
 endfunction
 
-function g:GetPriority(type)
+function! g:GetPriority(type)
     let l:priority = 50
     if a:type == "l"
         let l:priority = 70
@@ -46,7 +61,7 @@ function g:GetPriority(type)
     return l:priority
 endfunction
 
-function g:ClearMatches()
+function! g:ClearMatches()
     for m in getmatches()
         if match(m['id'], 'Colorcode_') != -1
             call matchdelete(m['id'])
@@ -54,17 +69,29 @@ function g:ClearMatches()
     endfor
 endfunction
 
-function g:Colorcode_file()
+function! g:Colorcode_file()
     call g:ClearMatches()
     let l:hi_nr = 0
     for file in tagfiles()
         if filereadable(file)
             for line in readfile(file)
                 if line[0] != '!' " if the line is not a comment, parse it
-                    let words = split(line, "\t")
-                    let l:priority = g:GetPriority(words[3])
-                    let l:match = g:GetMatch(words[0], words[3])
+                    let l:split = split(line, "\t")
+                    let l:tagname = l:split[0]
+                    let l:tagfile = l:split[1]
+                    let l:tagaddress = l:split[2]
+                    let l:tagfield = l:split[3]
+                    let l:match = ""
+                    if l:tagfield == 'm' && len(l:split) > 4
+                        let l:tagfieldname = split(l:split[4], ":")[1]
+                        let l:match = g:GetMatch(l:tagname, l:tagfield, l:tagfile, l:tagfieldname)
+                    else
+                        let l:match = g:GetMatch(l:tagname, l:tagfield, l:tagfile)
+                    endif
+
+                    let l:priority = g:GetPriority(l:tagfield)
                     let l:color = g:GetColor(l:hi_nr)
+
                     execute 'highlight '.'Colorcode_'.l:hi_nr.' cterm=None ctermfg='.l:color.' ctermbg=None'
                     call matchadd('Colorcode_'.l:hi_nr, l:match, l:priority)
                     let l:hi_nr = l:hi_nr + 1
