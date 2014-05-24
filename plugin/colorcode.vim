@@ -61,16 +61,16 @@ function! g:GetPriority(type)
     return l:priority
 endfunction
 
-function! g:ClearMatches()
+function! g:ColorcodeClearMatches()
     for m in getmatches()
-        if match(m['id'], 'Colorcode_') != -1
+        if match(m['group'], 'Colorcode_') != -1
             call matchdelete(m['id'])
         endif
     endfor
 endfunction
 
-function! g:Colorcode_file()
-    call g:ClearMatches()
+function! g:Colorcode()
+    call g:ColorcodeClearMatches()
     let l:hi_nr = 0
     for file in tagfiles()
         if filereadable(file)
@@ -101,4 +101,4 @@ function! g:Colorcode_file()
     endfor
 endfunction
 
-call g:Colorcode_file()
+call g:Colorcode()
