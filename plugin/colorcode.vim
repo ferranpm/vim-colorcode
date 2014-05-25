@@ -25,23 +25,23 @@ let g:Colorcode_colors = [
             \ '88', '175', '206', '78', '74', '129', '141', '116', '58', '125',
             \ '142', '121', '32']
 
-function! g:GetExtension(file)
+function! colorcode#get_extension(file)
     let l:ar = split(a:file, '\.')
     return l:ar[len(l:ar)-1]
 endfunction
 
-function! g:GetColor(num)
+function! colorcode#get_color(num)
     let l:len = len(g:Colorcode_colors)
     return g:Colorcode_colors[a:num%l:len]
 endfunction
 
-function! g:GetMatch(name, type, file)
-    let l:extension = g:GetExtension(a:file)
+function! colorcode#get_match(name, type, file)
+    let l:extension = colorcode#get_extension(a:file)
     let l:match = '\<'.escape(a:name, "~").'\>'
 
     if a:type == "m"
         if l:extension == "c" || l:extension == "h"
-            let l:match = '\(\.\|->\)'.l:match
+            let l:match = '\( \|\.\|->\)'.l:match
         else
             let l:match = '\.'.l:match
         endif
@@ -54,7 +54,7 @@ function! g:GetMatch(name, type, file)
     return l:match
 endfunction
 
-function! g:GetPriority(type)
+function! colorcode#get_priority(type)
     let l:priority = 50
     if a:type == "l"
         let l:priority = 70
@@ -62,7 +62,7 @@ function! g:GetPriority(type)
     return l:priority
 endfunction
 
-function! g:ColorcodeClearMatches()
+function! colorcode#clear_matches()
     for m in getmatches()
         if match(m['group'], 'Colorcode_') != -1
             call matchdelete(m['id'])
@@ -70,9 +70,40 @@ function! g:ColorcodeClearMatches()
     endfor
 endfunction
 
-function! g:Colorcode()
-    call g:ColorcodeClearMatches()
-    let l:hi_nr = 0
+function! colorcode#insert_item(list, new_item)
+    let l:count = 0
+    let l:found = 0
+    if len(a:list) <= 0
+        call insert(a:list, a:new_item)
+    else
+        while l:count < len(a:list) && l:found == 0
+            if a:new_item["size"] < a:list[l:count]["size"]
+                call insert(a:list, a:new_item, l:count)
+                let l:found = 1
+            endif
+            let l:count = l:count + 1
+        endwhile
+        if l:found == 0
+            call add(a:list, a:new_item)
+        endif
+    endif
+endfunction
+
+function! colorcode#highlight(list)
+    let l:count = 0
+    for item in a:list
+        let l:match = colorcode#get_match(item['name'], item['type'], item['file'])
+        let l:priority = colorcode#get_priority(item['type'])
+        let l:color = colorcode#get_color(l:count)
+
+        execute 'highlight '.'Colorcode_'.l:count.' cterm=None ctermfg='.l:color.' ctermbg=None'
+        call matchadd('Colorcode_'.l:count, l:match, l:count)
+        let l:count = l:count + 1
+    endfor
+endfunction
+
+function! colorcode#get_list()
+    let l:list = []
     for file in tagfiles()
         if filereadable(file)
             for line in readfile(file)
@@ -82,18 +113,24 @@ function! g:Colorcode()
                     let l:tagfile = l:split[1]
                     let l:tagaddress = l:split[2]
                     let l:tagfield = l:split[3]
-                    let l:match = g:GetMatch(l:tagname, l:tagfield, l:tagfile)
-
-                    let l:priority = g:GetPriority(l:tagfield)
-                    let l:color = g:GetColor(l:hi_nr)
-
-                    execute 'highlight '.'Colorcode_'.l:hi_nr.' cterm=None ctermfg='.l:color.' ctermbg=None'
-                    call matchadd('Colorcode_'.l:hi_nr, l:match, l:priority)
-                    let l:hi_nr = l:hi_nr + 1
+                    let l:item = {
+                                \ 'name': l:tagname,
+                                \ 'size': strlen(l:tagname),
+                                \ 'file': l:tagfile,
+                                \ 'type': l:tagfield
+                                \ }
+                    call colorcode#insert_item(l:list, l:item)
                 endif
             endfor
         endif
     endfor
+    return l:list
 endfunction
 
-call g:Colorcode()
+function! colorcode#init()
+    call colorcode#clear_matches()
+    let l:list = colorcode#get_list()
+    call colorcode#highlight(l:list)
+endfunction
+
+call colorcode#init()
