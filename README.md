@@ -17,5 +17,5 @@ This plugin will only work if the tags file is in your working directory.
 Screenshot of a simple program with :syntax off
 ![Screenshot\_1](screenshot_1.jpg)
 
-... Whit the option `let g:colorcode_global=0`
+...with `let g:colorcode_global=1` option
 ![Screenshot\_2](screenshot_2.jpg)
