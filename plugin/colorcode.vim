@@ -4,32 +4,11 @@ endif
 
 " TODO: Improve this shitty solution
 let g:colorcode_namespace_to_number = {
-            \ 'a': 0,
-            \ 'b': 1,
-            \ 'c': 2,
-            \ 'd': 3,
-            \ 'e': 4,
-            \ 'f': 5,
-            \ 'g': 6,
-            \ 'h': 7,
-            \ 'i': 8,
-            \ 'j': 9,
-            \ 'k': 10,
-            \ 'l': 11,
-            \ 'm': 12,
-            \ 'n': 13,
-            \ 'o': 14,
-            \ 'p': 15,
-            \ 'q': 16,
-            \ 'r': 17,
-            \ 's': 18,
-            \ 't': 19,
-            \ 'u': 20,
-            \ 'v': 21,
-            \ 'w': 22,
-            \ 'x': 23,
-            \ 'y': 24,
-            \ 'z': 25
+            \ 'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4,
+            \ 'f': 5, 'g': 6, 'h': 7, 'i': 8, 'j': 9,
+            \ 'k': 10, 'l': 11, 'm': 12, 'n': 13, 'o': 14,
+            \ 'p': 15, 'q': 16, 'r': 17, 's': 18, 't': 19,
+            \ 'u': 20, 'v': 21, 'w': 22, 'x': 23, 'y': 24, 'z': 25
             \ }
 
 if !exists("g:colorcode_colors")
@@ -68,7 +47,7 @@ endfunction
 
 function! colorcode#get_color(num, type)
     if g:colorcode_global
-        let l:color = g:colorcode_colors[g:colorcode_namespace_to_number[a:type]]
+        let l:color = g:colorcode_colors[get(g:colorcode_namespace_to_number, a:type, 0)]
     else
         let l:len = len(g:colorcode_colors)
         let l:color = g:colorcode_colors[a:num%l:len]
