@@ -120,21 +120,31 @@ function! colorcode#insert_item(list, item)
 endfunction
 
 function! colorcode#highlight(list)
-    let l:count = 0
-    for item in a:list
-        let l:match = colorcode#get_match(item)
-        let l:priority = colorcode#get_priority(item)
-        if g:colorcode_global
-            let l:color = colorcode#get_item_color(item)
-        else
+    if g:colorcode_global
+        for key in keys(g:colorcode_type_to_index)
+            let l:num = get(g:colorcode_type_to_index, key, 0)
+            let l:color = colorcode#get_color(l:num)
+            execute 'highlight '.'Colorcode_'.l:num.' cterm=None ctermfg='.l:color.' ctermbg=None'
+        endfor
+        for item in a:list
+            let l:num = get(g:colorcode_type_to_index, item["type"], 0)
+            let l:match = colorcode#get_match(item)
+            let l:priority = colorcode#get_priority(item)
+            call matchadd('Colorcode_'.l:num, l:match, l:priority)
+        endfor
+    else
+        let l:count = 0
+        for item in a:list
+            let l:match = colorcode#get_match(item)
+            let l:priority = colorcode#get_priority(item)
             let l:color = colorcode#get_color(l:count)
-        endif
 
-        execute 'highlight '.'Colorcode_'.l:count.' cterm=None ctermfg='.l:color.' ctermbg=None'
-        call matchadd('Colorcode_'.l:count, l:match, l:priority)
+            execute 'highlight '.'Colorcode_'.l:count.' cterm=None ctermfg='.l:color.' ctermbg=None'
+            call matchadd('Colorcode_'.l:count, l:match, l:priority)
 
-        let l:count = l:count + 1
-    endfor
+            let l:count = l:count + 1
+        endfor
+    endif
 endfunction
 
 function! colorcode#get_list()
