@@ -22,7 +22,7 @@ if !exists("g:colorcode_colors")
 endif
 
 if !exists("g:colorcode_global")
-    let g:colorcode_global = 0
+    let g:colorcode_global = 1
 endif
 
 function! colorcode#get_extension(file)
