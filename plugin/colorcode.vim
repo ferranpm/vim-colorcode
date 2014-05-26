@@ -94,22 +94,28 @@ function! colorcode#clear_matches()
     endfor
 endfunction
 
+function! colorcode#insert_item_recursive(list, item, a, b)
+    if a:b - a:a <= 1
+        if exists("a:list[a:b]") && a:item["size"] > a:list[a:b]["size"]
+            call add(a:list, a:item)
+        else
+            call insert(a:list, a:item, a:b)
+        endif
+    else
+        let l:idx = (a:a + a:b)/2
+        if a:list[l:idx]["size"] < a:item["size"]
+            call colorcode#insert_item_recursive(a:list, a:item, l:idx, a:b)
+        else
+            call colorcode#insert_item_recursive(a:list, a:item, a:a, l:idx)
+        endif
+    endif
+endfunction
+
 function! colorcode#insert_item(list, item)
-    let l:count = 0
-    let l:found = 0
     if len(a:list) <= 0
         call insert(a:list, a:item)
     else
-        while l:count < len(a:list) && l:found == 0
-            if a:item["size"] < a:list[l:count]["size"]
-                call insert(a:list, a:item, l:count)
-                let l:found = 1
-            endif
-            let l:count = l:count + 1
-        endwhile
-        if l:found == 0
-            call add(a:list, a:item)
-        endif
+        call colorcode#insert_item_recursive(a:list, a:item, 0, len(a:list))
     endif
 endfunction
 
