@@ -48,7 +48,7 @@ function! colorcode#get_extension(file)
 endfunction
 
 function! colorcode#get_item_color(item)
-    let l:index = get(g:colorcode_type_to_index, a:item["type"], 0)
+    let l:index = get(g:colorcode_type_to_index, a:item["kind"], 0)
     return g:colorcode_colors[l:index]
 endfunction
 
@@ -58,16 +58,16 @@ function! colorcode#get_color(idx)
 endfunction
 
 function! colorcode#get_match(item)
-    let l:extension = colorcode#get_extension(a:item["file"])
+    let l:extension = colorcode#get_extension(a:item["filename"])
     let l:match = '\<'.escape(a:item["name"], "~").'\>'
 
-    if a:item["type"] == "m"
+    if a:item["kind"] == "m"
         if l:extension == "c" || l:extension == "h"
             let l:match = '\( \|\.\|->\)'.l:match
         else
             let l:match = '\.'.l:match
         endif
-    elseif a:item["type"] == "f"
+    elseif a:item["kind"] == "f"
         if l:extension == "c" || l:extension == "h"
             let l:match = l:match.' *(.*)'
         endif
@@ -78,9 +78,9 @@ endfunction
 
 function! colorcode#get_priority(item)
     let l:priority = 50
-    if a:item["type"] == "l"
+    if a:item["kind"] == "l"
         let l:priority = 70
-    elseif a:item["type"] == "m"
+    elseif a:item["kind"] == "m"
         let l:priority = 80
     endif
     return l:priority
@@ -96,14 +96,14 @@ endfunction
 
 function! colorcode#insert_item_recursive(list, item, a, b)
     if a:b - a:a <= 1
-        if exists("a:list[a:b]") && a:item["size"] > a:list[a:b]["size"]
+        if exists("a:list[a:b]") && strlen(a:item["name"]) > strlen(a:list[a:b]["name"])
             call add(a:list, a:item)
         else
             call insert(a:list, a:item, a:b)
         endif
     else
         let l:idx = (a:a + a:b)/2
-        if a:list[l:idx]["size"] < a:item["size"]
+        if strlen(a:list[l:idx]["name"]) < strlen(a:item["name"])
             call colorcode#insert_item_recursive(a:list, a:item, l:idx, a:b)
         else
             call colorcode#insert_item_recursive(a:list, a:item, a:a, l:idx)
@@ -127,7 +127,7 @@ function! colorcode#highlight(list)
             execute 'highlight '.'Colorcode_'.l:num.' cterm=None ctermfg='.l:color.' ctermbg=None'
         endfor
         for item in a:list
-            let l:num = get(g:colorcode_type_to_index, item["type"], 0)
+            let l:num = get(g:colorcode_type_to_index, item["kind"], 0)
             let l:match = colorcode#get_match(item)
             let l:priority = colorcode#get_priority(item)
             call matchadd('Colorcode_'.l:num, l:match, l:priority)
@@ -149,25 +149,8 @@ endfunction
 
 function! colorcode#get_list()
     let l:list = []
-    for file in tagfiles()
-        if filereadable(file)
-            for line in readfile(file)
-                if line[0] != '!' " if the line is not a comment, parse it
-                    let l:split = split(line, "\t")
-                    let l:tagname = l:split[0]
-                    let l:tagfile = l:split[1]
-                    let l:tagaddress = l:split[2]
-                    let l:tagfield = l:split[3]
-                    let l:item = {
-                                \ 'name': l:tagname,
-                                \ 'size': strlen(l:tagname),
-                                \ 'file': l:tagfile,
-                                \ 'type': l:tagfield
-                                \ }
-                    call colorcode#insert_item(l:list, l:item)
-                endif
-            endfor
-        endif
+    for item in taglist('.*')
+        call colorcode#insert_item(l:list, item)
     endfor
     return l:list
 endfunction
