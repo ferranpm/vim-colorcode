@@ -14,7 +14,7 @@ This plugin will only work if the tags file is in your working directory.
 
 ## Screenshots
 
-Screenshot of a simple program with :syntax off
+Screenshot of a simple program with `syntax off`
 ![Screenshot\_1](screenshot_1.jpg)
 
 ...with `let g:colorcode_global=1` option
