@@ -3,13 +3,15 @@ if (exists("g:loaded") && g:loaded) || v:version < 700 || &cp
 endif
 
 " TODO: Improve this shitty solution
-let g:colorcode_namespace_to_number = {
-            \ 'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4,
-            \ 'f': 5, 'g': 6, 'h': 7, 'i': 8, 'j': 9,
-            \ 'k': 10, 'l': 11, 'm': 12, 'n': 13, 'o': 14,
-            \ 'p': 15, 'q': 16, 'r': 17, 's': 18, 't': 19,
-            \ 'u': 20, 'v': 21, 'w': 22, 'x': 23, 'y': 24, 'z': 25
-            \ }
+if !exists("g:colorcode_type_to_index")
+    let g:colorcode_type_to_index = {
+                \ 'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4,
+                \ 'f': 5, 'g': 6, 'h': 7, 'i': 8, 'j': 9,
+                \ 'k': 10, 'l': 11, 'm': 12, 'n': 13, 'o': 14,
+                \ 'p': 15, 'q': 16, 'r': 17, 's': 18, 't': 19,
+                \ 'u': 20, 'v': 21, 'w': 22, 'x': 23, 'y': 24, 'z': 25
+                \ }
+endif
 
 if !exists("g:colorcode_colors")
     let g:colorcode_colors = [
@@ -45,27 +47,27 @@ function! colorcode#get_extension(file)
     return l:ar[len(l:ar)-1]
 endfunction
 
-function! colorcode#get_color(num, type)
-    if g:colorcode_global
-        let l:color = g:colorcode_colors[get(g:colorcode_namespace_to_number, a:type, 0)]
-    else
-        let l:len = len(g:colorcode_colors)
-        let l:color = g:colorcode_colors[a:num%l:len]
-    endif
-    return l:color
+function! colorcode#get_item_color(item)
+    let l:index = get(g:colorcode_type_to_index, a:item["type"], 0)
+    return g:colorcode_colors[l:index]
 endfunction
 
-function! colorcode#get_match(name, type, file)
-    let l:extension = colorcode#get_extension(a:file)
-    let l:match = '\<'.escape(a:name, "~").'\>'
+function! colorcode#get_color(idx)
+    let l:len = len(g:colorcode_colors)
+    return g:colorcode_colors[a:idx%l:len]
+endfunction
 
-    if a:type == "m"
+function! colorcode#get_match(item)
+    let l:extension = colorcode#get_extension(a:item["file"])
+    let l:match = '\<'.escape(a:item["name"], "~").'\>'
+
+    if a:item["type"] == "m"
         if l:extension == "c" || l:extension == "h"
             let l:match = '\( \|\.\|->\)'.l:match
         else
             let l:match = '\.'.l:match
         endif
-    elseif a:type == "f"
+    elseif a:item["type"] == "f"
         if l:extension == "c" || l:extension == "h"
             let l:match = l:match.' *(.*)'
         endif
@@ -74,10 +76,12 @@ function! colorcode#get_match(name, type, file)
     return l:match
 endfunction
 
-function! colorcode#get_priority(number, type)
+function! colorcode#get_priority(item)
     let l:priority = 50
-    if a:type == "l"
+    if a:item["type"] == "l"
         let l:priority = 70
+    elseif a:item["type"] == "m"
+        let l:priority = 80
     endif
     return l:priority
 endfunction
@@ -90,21 +94,21 @@ function! colorcode#clear_matches()
     endfor
 endfunction
 
-function! colorcode#insert_item(list, new_item)
+function! colorcode#insert_item(list, item)
     let l:count = 0
     let l:found = 0
     if len(a:list) <= 0
-        call insert(a:list, a:new_item)
+        call insert(a:list, a:item)
     else
         while l:count < len(a:list) && l:found == 0
-            if a:new_item["size"] < a:list[l:count]["size"]
-                call insert(a:list, a:new_item, l:count)
+            if a:item["size"] < a:list[l:count]["size"]
+                call insert(a:list, a:item, l:count)
                 let l:found = 1
             endif
             let l:count = l:count + 1
         endwhile
         if l:found == 0
-            call add(a:list, a:new_item)
+            call add(a:list, a:item)
         endif
     endif
 endfunction
@@ -112,12 +116,17 @@ endfunction
 function! colorcode#highlight(list)
     let l:count = 0
     for item in a:list
-        let l:match = colorcode#get_match(item['name'], item['type'], item['file'])
-        let l:priority = colorcode#get_priority(l:count, item['type'])
-        let l:color = colorcode#get_color(l:count, item['type'])
+        let l:match = colorcode#get_match(item)
+        let l:priority = colorcode#get_priority(item)
+        if g:colorcode_global
+            let l:color = colorcode#get_item_color(item)
+        else
+            let l:color = colorcode#get_color(l:count)
+        endif
 
         execute 'highlight '.'Colorcode_'.l:count.' cterm=None ctermfg='.l:color.' ctermbg=None'
         call matchadd('Colorcode_'.l:count, l:match, l:priority)
+
         let l:count = l:count + 1
     endfor
 endfunction
