@@ -96,9 +96,10 @@ function! colorcode#highlight(list)
             let l:match = colorcode#get_match(item)
             let l:priority = colorcode#get_priority(item)
             let l:color = colorcode#get_color(l:count)
+            let l:group = l:count%len(g:colorcode_colors)
 
-            execute 'highlight '.'Colorcode_'.l:count.' cterm=None ctermfg='.l:color.' ctermbg=None'
-            call matchadd('Colorcode_'.l:count, l:match, l:priority)
+            execute 'highlight '.'Colorcode_'.l:group.' cterm=None ctermfg='.l:color.' ctermbg=None'
+            call matchadd('Colorcode_'.l:group, l:match, l:priority)
 
             let l:count = l:count + 1
         endfor
