@@ -88,35 +88,10 @@ endfunction
 
 function! colorcode#clear_matches()
     for m in getmatches()
-        if match(m['group'], 'Colorcode_') != -1
+        if match(m['group'], '^Colorcode_\d\+$') != -1
             call matchdelete(m['id'])
         endif
     endfor
-endfunction
-
-function! colorcode#insert_item_recursive(list, item, a, b)
-    if a:b - a:a <= 1
-        if exists("a:list[a:b]") && strlen(a:item["name"]) > strlen(a:list[a:b]["name"])
-            call add(a:list, a:item)
-        else
-            call insert(a:list, a:item, a:b)
-        endif
-    else
-        let l:idx = (a:a + a:b)/2
-        if strlen(a:list[l:idx]["name"]) < strlen(a:item["name"])
-            call colorcode#insert_item_recursive(a:list, a:item, l:idx, a:b)
-        else
-            call colorcode#insert_item_recursive(a:list, a:item, a:a, l:idx)
-        endif
-    endif
-endfunction
-
-function! colorcode#insert_item(list, item)
-    if len(a:list) <= 0
-        call insert(a:list, a:item)
-    else
-        call colorcode#insert_item_recursive(a:list, a:item, 0, len(a:list))
-    endif
 endfunction
 
 function! colorcode#highlight(list)
@@ -147,12 +122,12 @@ function! colorcode#highlight(list)
     endif
 endfunction
 
+function! colorcode#sort_item(i1, i2)
+    return strlen(a:i1["name"]) >= strlen(a:i2["name"]) ? 1 : -1
+endfunction
+
 function! colorcode#get_list()
-    let l:list = []
-    for item in taglist('.*')
-        call colorcode#insert_item(l:list, item)
-    endfor
-    return l:list
+    return sort(taglist('.*'), "colorcode#sort_item")
 endfunction
 
 function! colorcode#init()
