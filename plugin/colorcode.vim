@@ -27,3 +27,4 @@ endif
 
 
 call colorcode#init()
+colorscheme colorcode
