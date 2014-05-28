@@ -21,10 +21,10 @@ if !exists("g:colorcode_colors")
                 \ ]
 endif
 
-if !exists("g:colorcode_global")
-    let g:colorcode_global = 1
+if !exists("g:colorcode_global") | let g:colorcode_global = 1 | endif
+if !exists("g:colorcode_enable") | let g:colorcode_enable = 1 | endif
+
+if g:colorcode_enable
+    call colorcode#init()
+    colorscheme colorcode
 endif
-
-
-call colorcode#init()
-colorscheme colorcode
