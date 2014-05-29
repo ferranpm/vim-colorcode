@@ -25,8 +25,9 @@ if !exists("g:colorcode_global") | let g:colorcode_global = 1 | endif
 if !exists("g:colorcode_enable") | let g:colorcode_enable = 1 | endif
 
 if g:colorcode_enable
-    if len(taglist('.*')) > 0
+    if len(tagfiles()) > 0
         call colorcode#init()
         colorscheme colorcode
+        autocmd! BufWritePost * call system("ctags --append ".expand("%")) | call colorcode#init()
     endif
 endif
