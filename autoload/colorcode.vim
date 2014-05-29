@@ -19,7 +19,7 @@ function! colorcode#get_match(item)
 
     if a:item["kind"] == "m"
         if l:extension == "c" || l:extension == "h"
-            let l:match = '\( \|\.\|->\)'.l:match
+            let l:match = '\( \|*\|\.\|->\)'.l:match
         else
             let l:match = '\.'.l:match
         endif
