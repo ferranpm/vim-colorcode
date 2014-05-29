@@ -10,11 +10,15 @@ Inspired by [this post](https://medium.com/programming-ideas-tutorial-and-experi
 
 ## Usage
 
-This plugin will only work if the tags file is in your working directory.
+This plugin will only work if tags files are in your working directory.
+It only loads if it finds at least one tags file.
+After that, each time the file is saved, ctags is called and file gets repainted.
+
+To disable this plugin use `let g:colorcode_enable=0`
 
 ## Screenshots
 
-Screenshot of a simple program with `syntax off`
+Screenshot of a simple program with `syntax off` and `let g:colorcode_global=0`
 ![Screenshot\_1](screenshot_1.jpg)
 
 ...with `let g:colorcode_global=1` option
