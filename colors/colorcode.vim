@@ -29,9 +29,9 @@ highlight Macro         cterm=None ctermfg=None ctermbg=None
 highlight PreCondit     cterm=None ctermfg=None ctermbg=None
 
 highlight Type          cterm=None ctermfg=245  ctermbg=None
-highlight StorageClass  cterm=None ctermfg=None ctermbg=None
-highlight Structure     cterm=None ctermfg=None ctermbg=None
-highlight Typedef       cterm=None ctermfg=None ctermbg=None
+highlight StorageClass  cterm=None ctermfg=245 ctermbg=None
+highlight Structure     cterm=None ctermfg=245 ctermbg=None
+highlight Typedef       cterm=None ctermfg=245 ctermbg=None
 
 highlight Special       cterm=None ctermfg=None ctermbg=None
 highlight SpecialChar   cterm=None ctermfg=None ctermbg=None
