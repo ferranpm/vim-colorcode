@@ -23,3 +23,10 @@ Screenshot of a simple program with `syntax off` and `let g:colorcode_global=0`
 
 ...with `let g:colorcode_global=1` option
 ![Screenshot\_2](screenshot_2.jpg)
+
+## ToDo
+
+- [ ] Make it respect other colorschemes
+- [ ] Make it work on light backgrounds
+- [ ] Make it faster (specially with `g:colorcode_global=0`)
+- [ ] Add gvim support
