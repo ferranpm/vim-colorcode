@@ -30,3 +30,4 @@ Screenshot of a simple program with `syntax off` and `let g:colorcode_global=0`
 - [ ] Make it work on light backgrounds
 - [ ] Make it faster (specially with `g:colorcode_global=0`)
 - [ ] Add gvim support
+- [ ] Check if a tag is from the same filetype (a python tag should not appear in a vim script)
