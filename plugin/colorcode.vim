@@ -1,9 +1,9 @@
-if (exists("g:loaded") && g:loaded) || v:version < 700 || &cp
+if (exists('g:loaded') && g:loaded) || v:version < 700 || &cp
     finish
 endif
 
 " TODO: Improve this shitty solution
-if !exists("g:colorcode_type_to_index")
+if !exists('g:colorcode_type_to_index')
     let g:colorcode_type_to_index = {
                 \ 'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4,
                 \ 'f': 13, 'g': 6, 'h': 7, 'i': 5, 'j': 9,
@@ -13,7 +13,7 @@ if !exists("g:colorcode_type_to_index")
                 \ }
 endif
 
-if !exists("g:colorcode_colors")
+if !exists('g:colorcode_colors')
     let g:colorcode_colors = [
                 \ '18', '20', '22', '23', '26', '40', '41', '44', '52', '53', '55',
                 \ '58', '61', '74', '84', '89', '97', '105', '132', '136', '157', '166',
@@ -21,11 +21,11 @@ if !exists("g:colorcode_colors")
                 \ ]
 endif
 
-if !exists("g:colorcode_global") | let g:colorcode_global = 1 | endif
-if !exists("g:colorcode_enable") | let g:colorcode_enable = 1 | endif
+if !exists('g:colorcode_global') | let g:colorcode_global = 1 | endif
+if !exists('g:colorcode_enable') | let g:colorcode_enable = 1 | endif
 
 if g:colorcode_enable && len(tagfiles()) > 0
     call colorcode#init()
     colorscheme colorcode
-    autocmd! BufWritePost * call system("ctags --append ".expand("%")) | call colorcode#init()
+    autocmd! BufWritePost * call system('ctags --append '.expand('%')) | call colorcode#init()
 endif

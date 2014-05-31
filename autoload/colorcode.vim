@@ -3,28 +3,23 @@ function! colorcode#get_extension(file)
     return l:ar[len(l:ar)-1]
 endfunction
 
-function! colorcode#get_item_color(item)
-    let l:index = get(g:colorcode_type_to_index, a:item["kind"], 0)
-    return g:colorcode_colors[l:index]
-endfunction
-
-function! colorcode#get_color(idx)
+function! colorcode#get_color(n)
     let l:len = len(g:colorcode_colors)
-    return g:colorcode_colors[a:idx%l:len]
+    return g:colorcode_colors[a:n%l:len]
 endfunction
 
 function! colorcode#get_match(item)
-    let l:extension = colorcode#get_extension(a:item["filename"])
-    let l:match = '\<'.escape(a:item["name"], "~").'\>'
+    let l:extension = colorcode#get_extension(a:item['filename'])
+    let l:match = '\<'.escape(a:item['name'], '~').'\>'
 
-    if a:item["kind"] == "m"
-        if l:extension == "c" || l:extension == "h"
+    if a:item['kind'] == 'm'
+        if l:extension == 'c' || l:extension == 'h'
             let l:match = '\( \|*\|\.\|->\)'.l:match
         else
             let l:match = '\.'.l:match
         endif
-    elseif a:item["kind"] == "f"
-        if l:extension == "c" || l:extension == "h"
+    elseif a:item['kind'] == 'f'
+        if l:extension == 'c' || l:extension == 'h'
             let l:match = l:match.' *\(.*\)'
         endif
     endif
@@ -34,9 +29,9 @@ endfunction
 
 function! colorcode#get_priority(item)
     let l:priority = 50
-    if a:item["kind"] == "l"
+    if a:item['kind'] == 'l'
         let l:priority = 70
-    elseif a:item["kind"] == "m"
+    elseif a:item['kind'] == 'm'
         let l:priority = 80
     endif
     return l:priority
@@ -57,7 +52,7 @@ function! colorcode#highlight_global(list)
         execute 'highlight '.'Colorcode_'.l:num.' cterm=None ctermfg='.l:color.' ctermbg=None'
     endfor
     for item in a:list
-        let l:num = get(g:colorcode_type_to_index, item["kind"], 0)
+        let l:num = get(g:colorcode_type_to_index, item['kind'], 0)
         let l:match = colorcode#get_match(item)
         let l:priority = colorcode#get_priority(item)
         call matchadd('Colorcode_'.l:num, l:match, l:priority)
@@ -88,11 +83,11 @@ function! colorcode#highlight(list)
 endfunction
 
 function! colorcode#sort_item(i1, i2)
-    return strlen(a:i1["name"]) >= strlen(a:i2["name"]) ? 1 : -1
+    return strlen(a:i1['name']) >= strlen(a:i2['name']) ? 1 : -1
 endfunction
 
 function! colorcode#get_list()
-    return sort(taglist('\m.*'), "colorcode#sort_item")
+    return sort(taglist('\m.*'), 'colorcode#sort_item')
 endfunction
 
 function! colorcode#init()
