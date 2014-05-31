@@ -29,7 +29,7 @@ function! colorcode#get_match(item)
         endif
     endif
 
-    return l:match
+    return '\m'.l:match
 endfunction
 
 function! colorcode#get_priority(item)
@@ -84,7 +84,7 @@ function! colorcode#sort_item(i1, i2)
 endfunction
 
 function! colorcode#get_list()
-    return sort(taglist('.*'), "colorcode#sort_item")
+    return sort(taglist('\m.*'), "colorcode#sort_item")
 endfunction
 
 function! colorcode#init()
